@@ -1,0 +1,30 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Playground Example",
+      "program": "${workspaceFolder}/src/index.ts",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: build-debug",
+      "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "externalTerminal",
+      "runtimeArgs": [
+        "--preserve-symlinks"
+      ],
+      "args": [
+        "--file",
+        "./test-suite-examples/example1.yaml"
+      ]
+    },
+  ]
+}

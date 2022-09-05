@@ -1,0 +1,93 @@
+# These tests can be also split in multiple files
+# The test runner will pick all files with specific naming eg in test1.spec.yaml -> *.spec.yaml
+# The tests will be ran against specific app (apps?). The id will be defined when executed
+# if this is part of qlBuilder then the qlBuilder config can be used
+description: Set of test to execute against Qlik app
+author: Someone Whatever
+version: 0.0.1 # is this needed at all?
+skip: false # needed?
+selections: # make selections before the tests are ran
+  # useful for regression testing
+  - field: Year
+    values: [2020, 2021, 2022]
+spec:
+  Meta:
+    DataModel:
+      # check for fields presence
+      Field: [Year, OrderDate, SalesAmount, OrderId]
+      # check for table presence
+      Table:
+        - MasterCalendar
+        - OrderTransactions
+      # synthetic keys are allowed?
+      SyntheticKeys: false
+    Field: # number of values in fields
+      - name: Year
+        count: 3
+      - name: OrderId
+        count: 10
+    Table: # number of rows in tables
+      - name: OrderTransactions
+        count: 10
+      - name: MasterCalendar
+        count: 36
+    # check for variables presence
+    Variable:
+      Exists: [vTest, vLastYear]
+      DoNotExists: [vTest1]
+  Scalar: # single expression validation. Strict comparison by default
+    - name: Sum of sales 1
+      description: Test if the sum of sales amount is equal to 1000
+      expression: sum(SalesAmount)
+      result: 1000
+    - name: Sum of sales 2
+      description: Test if the sum of sales amount is greater than 500
+      expression: sum(SalesAmount)
+      operator: ">"
+      result: 1000
+      details: # why not to allow checks in different state? bit niche but possible
+        state: $
+    - name: Count orders
+      description: Test if the the number of orders is 10
+      expression: count(distinct OrderId)
+      result: 10
+    - name: Presence of UK
+      description: Test if the field Country have value of UK
+      expression: count({< Country = {'UK'} >} Country)
+      result: 1
+    - name: Variable content
+      description: Test the content of a variable
+      expression: $(someVariableName)
+      result: some variable content here
+  List: # fields values comparison. Dont think there should be the option to match just a subset
+    # of values? if this is used with mock data then full match should be expected
+    - name: Countries list
+      description: Match
+      values:
+        - UK
+        - USA
+        - Poland
+        - Australia
+  Table: # any reason to have more than straight table?
+    - name: Table result 1
+      description: Create session object table and compare the result
+      dimensions:
+        - Year
+      measures:
+        - label: Sales
+          calculation: sum(SalesAmount)
+        - label: Orders
+          calculation: count(distinct OrderId)
+      sort: # need to be expanded. Have to support expressions as well
+        - Year ASC
+        - Sales DEC
+      result:
+        Columns: [Year, Sales, Orders]
+        Rows:
+          - [2020, 200, 2]
+          - [2021, 300, 3]
+          - [2022, 500, 5]
+  Object: # test objects existence. Its not data test but think it must exists as an option
+    - 1234-1234-1234-1234
+    - abcD
+    - 5678-5678-5678-5678

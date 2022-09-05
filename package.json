@@ -1,0 +1,66 @@
+{
+  "name": "test-o-matiq-cli",
+  "version": "0.0.1",
+  "description": "CLI wrapper for test-o-matiq. Data tests for Qlik Sense apps ",
+  "author": {
+    "email": "info@informatiqal.com",
+    "name": "Informatiqal @informatiqal",
+    "url": "https://informatiqal.com"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "build-debug": "rollup -c rollup.config.debug.js",
+    "start": "node out/app.js",
+    "prestart": "npm run build",
+    "build:tsc": "tsc",
+    "test": "mocha --require ts-node/esm test/**/*.spec.js"
+  },
+  "homepage": "https://github.com/informatiqal/test-o-matiq-cli",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/informatiqal/test-o-matiq-cli.git"
+  },
+  "keywords": [
+    "qlik",
+    "sense",
+    "build",
+    "script",
+    "reload"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@p-mcgowan/minimist": "^2.1.0",
+    "enigma-mixin": "^1.3.2",
+    "enigma.js": "^2.9.0",
+    "js-yaml": "^4.1.0",
+    "minimist": "^1.2.6",
+    "ora": "^6.1.2",
+    "ws": "^8.8.1"
+  },
+  "engines": {
+    "node": ">=12.20"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "22.0.2",
+    "@rollup/plugin-json": "4.1.0",
+    "@types/chai": "4.3.3",
+    "@types/chalk": "2.2.0",
+    "@types/enigma.js": "2.2.2",
+    "@types/js-yaml": "4.0.5",
+    "@types/mocha": "9.1.1",
+    "@types/node": "18.7.9",
+    "@types/qlik-engineapi": "12.67.12",
+    "@types/ws": "8.5.3",
+    "chai": "4.3.6",
+    "dotenv": "16.0.1",
+    "mocha": "10.0.0",
+    "nyc": "15.1.0",
+    "rollup": "2.78.1",
+    "rollup-plugin-delete": "2.0.0",
+    "rollup-plugin-terser": "7.0.2",
+    "rollup-plugin-typescript2": "0.33.0",
+    "ts-node": "10.9.1"
+  }
+}
