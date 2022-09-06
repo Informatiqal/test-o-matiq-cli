@@ -1,7 +1,7 @@
 import { existsSync } from "fs";
 import { minimist } from "@p-mcgowan/minimist";
 
-import { TestOMatiqCLI } from "./lib/CLI";
+import { TestOMatiqCLI } from "./lib/Cli";
 import { printHelp } from "./lib/help";
 import { generateSample } from "./lib/sample";
 
@@ -21,11 +21,10 @@ if (argv.help || argv.h) {
 
 if (argv.sample || argv.s) {
   generateSample(argv.sample || argv.s);
-  console.log(`\u2705 "automatiqal-sample.yaml" generated!`);
-  console.log(`\u2705 "automatiqal-sample.variables.yaml" generated!`);
+  console.log(`\u2705 "test-o-matiq-sample.yaml" generated!`);
   console.log("");
   console.log(
-    `\u2705 \x1b[33mMore examples can be found at https://github.com/Informatiqal/automatiqal-cli/tree/main/runbook-examples\x1b[0m`
+    `\u2705 \x1b[33mMore examples can be found at https://github.com/Informatiqal/test-o-matiq-cli/tree/main/test-suite-examples\x1b[0m`
   );
   process.exit(0);
 }
@@ -36,22 +35,9 @@ if (!argv.file && !argv.f) {
   process.exit(1);
 }
 
-if (argv.v || argv.var || argv.variables) {
-  if (!existsSync(argv.v || argv.var || argv.variables)) {
-    console.log(
-      `\u274C ERROR 1011: Variables file not found: "${
-        argv.v || argv.var || argv.variables
-      }"`
-    );
-    process.exit(1);
-  }
-}
-
 // file argument provided but the file do not exists
 if (!existsSync(argv.file || argv.f)) {
-  console.log(
-    `\u274C ERROR 1002: Runbook file not found: "${argv.file || argv.f}"`
-  );
+  console.log(`\u274C ERROR 1002: file not found: "${argv.file || argv.f}"`);
   process.exit(1);
 }
 

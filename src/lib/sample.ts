@@ -68,21 +68,9 @@ export function generateSample(format: string) {
     ],
   };
 
-  const variables = `host=my-qlik-host.com
-certificate=path/to/client.pem
-certificate_key=path/to/client_key.pem
-user_dir=SOME-USER-DIR
-user_name=SOME-USER`;
-
   try {
-    writeFileSync(".\\automatiqal-sample.yaml", dump(qseowSample));
+    writeFileSync(".\\test-o-matiq-sample.yaml", dump(qseowSample));
   } catch (e) {
     console.log(`\u274C ERROR: Unable to create sample file"`);
-  }
-
-  try {
-    writeFileSync(".\\automatiqal-sample.variables.yaml", dump(variables, {}));
-  } catch (e) {
-    console.log(`\u274C ERROR: Unable to create sample variables file"`);
   }
 }
