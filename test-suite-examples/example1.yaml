@@ -33,7 +33,7 @@ spec:
         count: 36
     # check for variables presence
     Variable:
-      [vTest, vLastYear]
+      Exists: [vTest, vLastYear]
       # Exists: [vTest, vLastYear]
       # DoNotExists: [vTest1]
   Scalar: # single expression validation. Strict comparison by default

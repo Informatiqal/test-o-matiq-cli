@@ -17,7 +17,7 @@ export function generateSample(format: string) {
         user_name: "${user_name}",
       },
     },
-    tasks: [
+    tests: [
       {
         name: "Import application",
         description: "Import brand new qvf",
@@ -70,7 +70,16 @@ export function generateSample(format: string) {
 
   try {
     writeFileSync(".\\test-o-matiq-sample.yaml", dump(qseowSample));
+
+    console.log(`\u2705 "test-o-matiq-sample.yaml" generated!`);
+    console.log("");
+    console.log(
+      `\u2705 \x1b[33mMore examples can be found at https://github.com/Informatiqal/test-o-matiq-cli/tree/main/test-suite-examples\x1b[0m`
+    );
+
+    process.exit(0);
   } catch (e) {
     console.log(`\u274C ERROR: Unable to create sample file"`);
+    process.exit(1);
   }
 }

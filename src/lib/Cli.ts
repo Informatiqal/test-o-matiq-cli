@@ -1,23 +1,22 @@
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { load } from "js-yaml";
-import { QlikTesting } from "test-o-matiq";
+import { TestOMatiq } from "test-o-matiq";
 import * as enigma from "enigma.js";
 import WebSocket from "ws";
 import * as schema from "enigma.js/schemas/12.20.0.json";
 import { docMixin } from "enigma-mixin";
 import ora from "ora";
 
-import { IEventError, Root } from "test-o-matiq/dist/interface/Specs";
+import { IEventError, Root } from "test-o-matiq/dist/src/interface/Specs";
 
 import { IArguments } from "./interfaces";
 
 export class TestOMatiqCLI {
   private argv: IArguments;
   private testSuite: Root;
-  // private result: ITaskResult[];
   private result: [];
   private httpsAgent: any;
-  private qlikTesting: QlikTesting.client;
+  private testOMatiq: TestOMatiq.client;
   private rawTestSuiteBook: string;
   private qlikApp: EngineAPI.IApp;
   private qlikSession: enigmaJS.ISession;
@@ -46,7 +45,10 @@ export class TestOMatiqCLI {
     this.qlikSession = enigmaClass.create(enigmaConfig);
 
     try {
-      this.rawTestSuiteBook = readFileSync(this.argv.file, "utf8").toString();
+      this.rawTestSuiteBook = readFileSync(
+        this.argv.file || this.argv.f,
+        "utf8"
+      ).toString();
     } catch (e) {
       console.log(`\u274C ERROR 1000: while reading the test suite file`);
       console.log(e.message);
@@ -55,10 +57,7 @@ export class TestOMatiqCLI {
 
     this.testSuiteSet();
     try {
-      this.qlikTesting = new QlikTesting.client(
-        this.testSuite,
-        this.httpsAgent
-      );
+      this.testOMatiq = new TestOMatiq.client(this.testSuite, this.httpsAgent);
     } catch (e) {
       if (e.context) {
         console.log(e.context);
@@ -66,6 +65,7 @@ export class TestOMatiqCLI {
       }
       if (e.message) {
         console.log(e.message);
+        if (e.errors) console.log(JSON.stringify(e.errors, null, 4));
         process.exit(1);
       }
     }
@@ -84,9 +84,9 @@ export class TestOMatiqCLI {
     this.qlikApp = await global.openDoc(
       `C:/Users/countnazgul/Documents/Qlik/Sense/Apps/Consumer_Sales(2).qvf`
     ); //as IAppMixin;
-    this.qlikTesting = new QlikTesting.client(this.testSuite, this.qlikApp);
+    this.testOMatiq = new TestOMatiq.client(this.testSuite, this.qlikApp);
     this.emittersSet();
-    const b = await this.qlikTesting.run();
+    const b = await this.testOMatiq.run();
     // if (this.argv.output || this.argv.o) this.writeOut();
 
     console.log(`----------------------------`);
@@ -137,7 +137,7 @@ export class TestOMatiqCLI {
     let spinners = {};
 
     // const spinners =
-    this.qlikTesting.testGroups.map((group) => {
+    this.testOMatiq.testGroups.map((group) => {
       const spinner = ora(group);
 
       spinners[group] = {
@@ -145,7 +145,7 @@ export class TestOMatiqCLI {
       };
     });
 
-    this.qlikTesting.emitter.on("group", async function (a) {
+    this.testOMatiq.emitter.on("group", async function (a) {
       // const spinner = ora("Loading unicorns").start();
 
       if (a.isFinished == false)
@@ -166,7 +166,7 @@ export class TestOMatiqCLI {
 
       let b = 1;
     });
-    this.qlikTesting.emitter.on("testError", function (errorMessage) {
+    this.testOMatiq.emitter.on("testError", function (errorMessage) {
       _this.erroredTest.push(errorMessage);
     });
   }

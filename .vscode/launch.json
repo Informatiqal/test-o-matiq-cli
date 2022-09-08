@@ -22,7 +22,7 @@
         "--preserve-symlinks"
       ],
       "args": [
-        "--file",
+        "-f",
         "./test-suite-examples/example1.yaml"
       ]
     },

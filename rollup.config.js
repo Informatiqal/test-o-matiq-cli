@@ -11,7 +11,7 @@ export default {
   output: {
     format: "es",
     dir: "dist",
-    sourcemap: false,
+    sourcemap: true,
   },
   external: [
     ...Object.keys(pkg.dependencies || {}),
