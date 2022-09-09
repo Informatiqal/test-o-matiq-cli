@@ -2,6 +2,9 @@
 
 > **Warning**
 > Under development!
+
+---
+
 > **Note**
 > Please check out the [Wiki section](https://github.com/Informatiqal/test-o-matiq-cli/wiki) for details and examples
 
