@@ -2,12 +2,12 @@ import { readFileSync } from "fs";
 import { load } from "js-yaml";
 import { TestOMatiq } from "test-o-matiq";
 import * as enigma from "enigma.js";
-import WebSocket from "ws";
+import * as WebSocket from "ws";
 import * as schema from "enigma.js/schemas/12.20.0.json";
 import { docMixin } from "enigma-mixin";
 import ora from "ora";
 
-import { IEventError, Root } from "test-o-matiq/dist/src/interface/Specs";
+import { IEventError, Root } from "test-o-matiq/dist/interface/Specs";
 
 import { IArguments } from "./interfaces";
 
@@ -16,7 +16,7 @@ export class TestOMatiqCLI {
   private testSuite: Root;
   private result: [];
   private httpsAgent: any;
-  private testOMatiq: TestOMatiq.client;
+  private testOMatiq: TestOMatiq;
   private rawTestSuiteBook: string;
   private qlikApp: EngineAPI.IApp;
   private qlikSession: enigmaJS.ISession;
@@ -57,7 +57,7 @@ export class TestOMatiqCLI {
 
     this.testSuiteSet();
     try {
-      this.testOMatiq = new TestOMatiq.client(this.testSuite, this.httpsAgent);
+      this.testOMatiq = new TestOMatiq(this.testSuite, this.httpsAgent);
     } catch (e) {
       if (e.context) {
         console.log(e.context);
@@ -84,7 +84,7 @@ export class TestOMatiqCLI {
     this.qlikApp = await global.openDoc(
       `C:/Users/countnazgul/Documents/Qlik/Sense/Apps/Consumer_Sales(2).qvf`
     ); //as IAppMixin;
-    this.testOMatiq = new TestOMatiq.client(this.testSuite, this.qlikApp);
+    this.testOMatiq = new TestOMatiq(this.testSuite, this.qlikApp);
     this.emittersSet();
     const b = await this.testOMatiq.run();
     // if (this.argv.output || this.argv.o) this.writeOut();

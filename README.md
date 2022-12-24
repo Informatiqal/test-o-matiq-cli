@@ -28,6 +28,7 @@ Example yaml file:
 # yaml-language-server: $schema=https://github.com/Informatiqal/test-o-matiq/blob/main/src/schema/root.json?raw=true
 
 # ^^^ used to load json schema for better intellisense
+# if using VSCode please use "YAML" extension
 
 description: Set of test to execute against Qlik app
 author: Someone Whatever
