@@ -52,7 +52,7 @@
     "@rollup/plugin-json": "6.0.0",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-typescript": "^11.0.0",
-    "@types/chai": "4.3.4",
+    "@types/chai": "4.3.5",
     "@types/chalk": "2.2.0",
     "@types/enigma.js": "2.2.2",
     "@types/js-yaml": "4.0.5",
