@@ -3,12 +3,12 @@
     "outDir": "./dist",
     "target": "ES6",
     "declaration": true,
-    "declarationDir": "./dist",
-    "module": "ES2020",
+    "module": "ESNext",
     "noImplicitAny": false,
     "sourceMap": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "es2021"
     ],

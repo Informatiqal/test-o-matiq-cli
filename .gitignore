@@ -3,6 +3,7 @@ tsconfig copy.json
 index.doc.ts
 .npmrc
 playground.spec.ts
+playground.yaml
 # Logs
 logs
 *.log

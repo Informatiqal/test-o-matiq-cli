@@ -3,13 +3,14 @@ import { load } from "js-yaml";
 import { TestOMatiq } from "test-o-matiq";
 import * as enigma from "enigma.js";
 import * as WebSocket from "ws";
-import * as schema from "enigma.js/schemas/12.20.0.json";
+import schema from "enigma.js/schemas/12.20.0.json" assert { type: "json" };
 import { docMixin } from "enigma-mixin";
 import ora from "ora";
 
 import { IEventError, Root } from "test-o-matiq/dist/interface/Specs";
 
 import { IArguments } from "./interfaces";
+import { assert } from "console";
 
 export class TestOMatiqCLI {
   private argv: IArguments;

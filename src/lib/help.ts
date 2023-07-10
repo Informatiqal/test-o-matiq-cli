@@ -1,7 +1,7 @@
 export function printHelp() {
   const messages = [
     "",
-    `test-o-matiq CLI\x1b[32;1m v__VERSION\x1b[0m`,
+    `test-o-matiq CLI\x1b[32;1m __VERSION\x1b[0m`,
     "",
     "Usage: test-o-matiq [options]",
     "",
