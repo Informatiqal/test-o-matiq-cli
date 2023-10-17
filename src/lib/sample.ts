@@ -1,5 +1,5 @@
 import { writeFileSync } from "fs";
-import { load, dump } from "js-yaml";
+import { dump } from "js-yaml";
 
 export function generateSample(format: string) {
   if (!format) format = "yaml";

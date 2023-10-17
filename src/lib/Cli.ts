@@ -1,49 +1,23 @@
 import { readFileSync } from "fs";
 import { load } from "js-yaml";
 import { TestOMatiq } from "test-o-matiq";
-import * as enigma from "enigma.js";
-import * as WebSocket from "ws";
-import schema from "enigma.js/schemas/12.20.0.json" assert { type: "json" };
-import { docMixin } from "enigma-mixin";
-import ora from "ora";
+import ora, { Ora } from "ora";
 
-import { IEventError, Root } from "test-o-matiq/dist/interface/Specs";
+import { Runbook } from "test-o-matiq/dist/interface/Specs.js";
 
-import { IArguments } from "./interfaces";
-import { assert } from "console";
+import { IArguments } from "./interfaces.js";
+import { Engine } from "./Engine.js";
 
 export class TestOMatiqCLI {
   private argv: IArguments;
-  private testSuite: Root;
-  private result: [];
-  private httpsAgent: any;
+  private testSuite: Runbook;
   private testOMatiq: TestOMatiq;
   private rawTestSuiteBook: string;
   private qlikApp: EngineAPI.IApp;
-  private qlikSession: enigmaJS.ISession;
-  private erroredTest: IEventError[];
-  private totalTestsCount: number;
-  private failedTestsCount: number;
-  private totalRunTime: number;
+  private engine: Engine;
 
   constructor(argv: IArguments) {
     this.argv = argv;
-    this.result = [];
-    this.erroredTest = [] as IEventError[];
-    this.totalRunTime = 0;
-    this.totalTestsCount = 0;
-    this.failedTestsCount = 0;
-
-    const enigmaConfig: enigmaJS.IConfig = {
-      Promise: Promise,
-      schema: schema,
-      mixins: docMixin,
-      url: "ws://localhost:4848/app/engineData",
-      createSocket: (url) => new WebSocket(url),
-    };
-
-    const enigmaClass = (enigma as any).default as IEnigmaClass;
-    this.qlikSession = enigmaClass.create(enigmaConfig);
 
     try {
       this.rawTestSuiteBook = readFileSync(
@@ -57,53 +31,48 @@ export class TestOMatiqCLI {
     }
 
     this.testSuiteSet();
-    try {
-      this.testOMatiq = new TestOMatiq(this.testSuite, this.httpsAgent);
-    } catch (e) {
-      if (e.context) {
-        console.log(e.context);
-        process.exit(1);
-      }
-      if (e.message) {
-        console.log(e.message);
-        if (e.errors) console.log(JSON.stringify(e.errors, null, 4));
-        process.exit(1);
-      }
-    }
-    // this.emittersSet();
-    console.log("");
-    console.log(`Test-O-Matiq`);
-    console.log("");
-    console.log(`Suite description
-    ${this.testSuite.description}`);
-    console.log(`============================`);
-    console.log("");
+
+    this.engine = new Engine(this.testSuite.environment);
   }
 
   async run() {
-    const global: EngineAPI.IGlobal = await this.qlikSession.open();
-    this.qlikApp = await global.openDoc(
-      `C:/Users/countnazgul/Documents/Qlik/Sense/Apps/Consumer_Sales(2).qvf`
-    ); //as IAppMixin;
-    this.testOMatiq = new TestOMatiq(this.testSuite, this.qlikApp);
-    this.emittersSet();
-    const b = await this.testOMatiq.run();
-    // if (this.argv.output || this.argv.o) this.writeOut();
-
+    console.log("");
+    console.log(`Test-O-Matiq`);
     console.log(`----------------------------`);
-    console.log(`
-\u001b[1mSummary\u001b[0m
-
-  Total tests: ${this.totalTestsCount}
-  Failed tests: ${this.failedTestsCount}
-  Run time: ${this.totalRunTime} ms
-`);
     console.log("");
 
-    if (this.erroredTest.length > 0) this.printErrors();
+    const spinner = ora("Establishing connection").start();
 
-    return this.result;
+    try {
+      this.qlikApp = await this.engine.openDoc(spinner).then((_) => this.engine.doc);
+    } catch (e) {
+      spinner.fail(e.message);
+      process.exit(1);
+    }
+
+    spinner.succeed("App open");
+    console.log("");
+
+    if (this.testSuite.description) {
+      console.log(`${this.testSuite.description}`);
+      console.log(`----------------------------`);
+      console.log("");
+    }
+
+    this.testOMatiq = new TestOMatiq(this.testSuite, this.qlikApp, false);
+    this.emittersSet();
+    
+    const result = await this.testOMatiq.run();
+
+    console.log(`----------------------------`);
+    console.log(`\u001b[1mSummary\u001b[0m
+  Total tests: ${result.failedTests + result.passedTests}
+  Failed tests: ${result.failedTests}
+  Run time: ${result.totalTime} s`);
+
+    return result;
   }
+
   /**
    * @description set the test suite based on the provided yaml/json file
    */
@@ -111,7 +80,7 @@ export class TestOMatiqCLI {
     // if the config is yaml
     if (!this.argv.json) {
       try {
-        this.testSuite = load(this.rawTestSuiteBook) as Root;
+        this.testSuite = load(this.rawTestSuiteBook) as Runbook;
       } catch (e) {
         console.log(`\u274C ERROR 1003: while parsing the yaml file`);
         console.log(e.message);
@@ -129,62 +98,32 @@ export class TestOMatiqCLI {
       }
     }
   }
+
   /**
    * @description create all required emitters
    */
   private emittersSet() {
     const _this = this;
 
-    let spinners = {};
+    let spinners: { [k: string]: Ora } = {};
 
-    // const spinners =
-    this.testOMatiq.testGroups.map((group) => {
-      const spinner = ora(group);
-
-      spinners[group] = {
-        spinner,
-      };
+    this.testOMatiq.emitter.on("testResult", function (result) {
+      const spinnerMessage = `${result.name}\n\t${result.message}\n`;
+      result.status
+        ? spinners[result.name].succeed(spinnerMessage)
+        : spinners[result.name].fail(spinnerMessage);
+      // console.log(`END -> ${result.name}`);
     });
 
-    this.testOMatiq.emitter.on("group", async function (a) {
-      // const spinner = ora("Loading unicorns").start();
+    this.testOMatiq.emitter.on("testStart", function (name) {
+      const spinner = ora({
+        spinner: "circleHalves",
+        text: name,
+      });
+      spinners[name] = spinner;
+      spinners[name].start();
 
-      if (a.isFinished == false)
-        spinners[a.group].spinner.start(`${a.group} ...`);
-
-      if (a.isFinished == true) {
-        const message = `${a.group} (${a.elapsedTime}ms):
-    Total tests: ${a.totalTests}
-    Failed tests: ${a.failedTests}
-`;
-        _this.totalTestsCount += a.totalTests;
-        _this.failedTestsCount += a.failedTests;
-        _this.totalRunTime += a.elapsedTime;
-
-        if (a.status == true) spinners[a.group].spinner.succeed(message);
-        if (a.status == false) spinners[a.group].spinner.fail(message);
-      }
-
-      let b = 1;
+      // console.log(`START -> ${name}`);
     });
-    this.testOMatiq.emitter.on("testError", function (errorMessage) {
-      _this.erroredTest.push(errorMessage);
-    });
-  }
-
-  printErrors() {
-    console.log(`\u001b[1mFailed tests\u001b[0m`);
-    for (let i = 0; i < this.erroredTest.length; i++) {
-      const r = this.erroredTest[i];
-      const subGroupMessage = r.subGroup
-        ? `
-      Sub-group: ${r.subGroup}`
-        : "";
-
-      console.log(`
-  ${i + 1}) ${r.name}
-      Group: ${r.group}${subGroupMessage}    
-      Reason: ${r.reason}`);
-    }
   }
 }

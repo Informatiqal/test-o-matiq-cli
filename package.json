@@ -39,6 +39,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@informatiqal/variables-loader": "^0.0.6",
     "@p-mcgowan/minimist": "^2.1.0",
     "enigma-mixin": "^1.4.0",
     "enigma.js": "^2.12.0",

@@ -1,5 +1,6 @@
-import { existsSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import { minimist } from "@p-mcgowan/minimist";
+import { varLoader } from "@informatiqal/variables-loader";
 
 import { TestOMatiqCLI } from "./lib/Cli";
 import { printHelp } from "./lib/help";
@@ -24,19 +25,35 @@ if (!existsSync(argv.file || argv.f))
   printError(`\u274C ERROR 1002: file not found: "${argv.file || argv.f}"`);
 
 async function processFile() {
-  const runner = new TestOMatiqCLI(argv);
+  try {
+    const runner = new TestOMatiqCLI(argv);
 
-  runner
-    .run()
-    .then((d) => {
-      let b1 = 1;
-      process.exit(0);
-    })
-    .catch((e) => {
-      let b1 = 1;
-      process.exit(0);
-    });
+    await runner
+      .run()
+      .then((result) => {
+        if (argv.output || argv.o) writeOut(result, argv.output || argv.o);
+        process.exit(0);
+      })
+      .catch((e) => {
+        console.log(e.message);
+        process.exit(1);
+      });
+  } catch (e) {
+    // TODO: worth providing more info as a context? like which file was executed etc
+    // TODO: output the error to a file if "output" argument is provided?
+    console.log(e.message);
+    process.exit(1);
+  }
 }
 
 // if all is ok up to here - start processing
 processFile();
+
+function writeOut(result: any, path: string) {
+  try {
+    writeFileSync(path, JSON.stringify(result, null, 4));
+  } catch (e) {
+    console.log(`Unable to write the output:`);
+    console.log(e.message);
+  }
+}

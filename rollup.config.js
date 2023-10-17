@@ -33,7 +33,10 @@ export default {
       preventAssignment: true,
     }),
     nodeResolve(),
-    json(),
+    json({
+      compact: true,
+      include: ["node_modules/enigma.js/schemas/12.20.0.json"],
+    }),
     typescript(),
   ],
 };

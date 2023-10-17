@@ -26,5 +26,29 @@
         "./test-suite-examples/example1.yaml"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Write Output",
+      "program": "${workspaceFolder}/src/index.ts",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: build-debug",
+      "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "externalTerminal",
+      "runtimeArgs": [
+        "--preserve-symlinks"
+      ],
+      "args": [
+        "-f",
+        "./test-suite-examples/example1.yaml",
+        "-o",
+        "./test-suite-examples/test.json"
+      ]
+    }
   ]
 }

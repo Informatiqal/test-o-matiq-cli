@@ -16,6 +16,7 @@ export function printHelp() {
     "Examples:",
     "$ test-o-matiq --file ./test-suite.yaml",
     "$ test-o-matiq --file ./test-suite.json --json",
+    "$ test-o-matiq --file ./test-suite.json --var ./path/to/some/variables.yaml",
     "",
     "\x1b[33;1mIf you find test-o-matiq CLI useful, please consider sponsoring the project:",
     "https://github.com/informatiqal/test-o-matiq-cli\x1b[0m",
