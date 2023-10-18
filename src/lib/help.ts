@@ -12,16 +12,18 @@ export function printHelp() {
     "--connect,   -c     Test the connectivity. No tests are ran",
     "--sample,    -s     Generate sample run book files in the current folder",
     "--help,      -h     Shows this message",
+    "--variable,  -v     Location of the variable file (if needed)",
     "",
     "Examples:",
     "$ test-o-matiq --file ./test-suite.yaml",
     "$ test-o-matiq --file ./test-suite.json --json",
+    "$ test-o-matiq --file ./test-suite.json -v ./path/to/some/variables.yaml",
+    "$ test-o-matiq --file ./test-suite.yaml --output ./deployment_result.json",
     "",
     "\x1b[33;1mIf you find test-o-matiq CLI useful, please consider sponsoring the project:",
     "https://github.com/informatiqal/test-o-matiq-cli\x1b[0m",
     "",
   ];
-  // "$ test-o-matiq --file ./test-suite.yaml --output ./deployment_result.json",
 
   messages.forEach((message) => {
     console.log(message);

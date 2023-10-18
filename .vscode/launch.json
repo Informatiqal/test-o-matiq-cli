@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Playground Example",
+      "name": "Playground",
       "program": "${workspaceFolder}/src/index.ts",
       "sourceMaps": true,
       "preLaunchTask": "npm: build-debug",
@@ -23,8 +23,59 @@
       ],
       "args": [
         "-f",
-        "./test-suite-examples/example1.yaml"
+        "./test-suite-examples/example1.yaml",
+        "-v",
+        "./test-suite-examples/example1_variables.yaml"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Write Output",
+      "program": "${workspaceFolder}/src/index.ts",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: build-debug",
+      "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "externalTerminal",
+      "runtimeArgs": [
+        "--preserve-symlinks"
+      ],
+      "args": [
+        "-f",
+        "./test-suite-examples/example1.yaml",
+        "-o",
+        "./test-suite-examples/test.json"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Check connection",
+      "program": "${workspaceFolder}/src/index.ts",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: build-debug",
+      "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "externalTerminal",
+      "runtimeArgs": [
+        "--preserve-symlinks"
+      ],
+      "args": [
+        "-f",
+        "./test-suite-examples/example1.yaml",
+        "-v",
+        "./test-suite-examples/example1_variables.yaml",
+        "-c"
+      ]
+    }
   ]
 }
