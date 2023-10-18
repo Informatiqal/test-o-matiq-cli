@@ -123,4 +123,11 @@ export class TestOMatiqCLI {
       // console.log(`START -> ${name}`);
     });
   }
+
+  async checkConnectivity() {
+    const engineVersion = await this.engine.checkConnection();
+    await this.engine.closeSession();
+
+    return engineVersion;
+  }
 }

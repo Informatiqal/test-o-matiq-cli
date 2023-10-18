@@ -78,4 +78,17 @@ export class Engine {
       // TODO: what shall be executed here?
     }
   }
+
+  async checkConnection() {
+      const enigmaClass = (enigma as any).default as IEnigmaClass;
+      this.enigmaSession = enigmaClass.create(this.enigmaConfig);
+      const enigmaConnection: EngineAPI.IGlobal =
+        await this.enigmaSession.open();
+
+      const engineVersion = await enigmaConnection
+        .engineVersion()
+        .then((r) => r.qComponentVersion);
+
+      return engineVersion;
+  }
 }
