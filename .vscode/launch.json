@@ -23,7 +23,9 @@
       ],
       "args": [
         "-f",
-        "./test-suite-examples/example1.yaml"
+        "./test-suite-examples/example1.yaml",
+        "-v",
+        "./test-suite-examples/example1_variables.yaml"
       ]
     },
     {

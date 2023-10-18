@@ -3,10 +3,24 @@ import { WebSocket } from "ws";
 import { schema } from "./enigmaSchema";
 import { docMixin } from "enigma-mixin";
 import { Ora } from "ora";
-import {
-  EnvironmentDesktop,
-  EnvironmentSaaS,
-} from "test-o-matiq/dist/interface/Specs";
+// import {
+//   EnvironmentDesktop,
+//   EnvironmentSaaS,
+// } from "test-o-matiq/dist/interface/Specs";
+
+export interface EnvironmentDesktop {
+  host: string;
+  appId: string;
+  edition: "desktop";
+}
+export interface EnvironmentSaaS {
+  host: string;
+  appId: string;
+  edition: "saas";
+  authentication?: {
+    apiKey: string;
+  };
+}
 
 export class Engine {
   private enigmaConfig: enigmaJS.IConfig;
@@ -55,5 +69,13 @@ export class Engine {
     spinner.text = "Opening the app";
 
     this.doc = await enigmaConnection.openDoc(this.config.appId);
+  }
+
+  async closeSession() {
+    try {
+      await this.enigmaSession.close();
+    } catch (e) {
+      // TODO: what shall be executed here?
+    }
   }
 }

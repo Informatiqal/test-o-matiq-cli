@@ -1,37 +1,26 @@
-import { readFileSync } from "fs";
 import { load } from "js-yaml";
 import { TestOMatiq } from "test-o-matiq";
 import ora, { Ora } from "ora";
 
 import { Runbook } from "test-o-matiq/dist/interface/Specs.js";
 
-import { IArguments } from "./interfaces.js";
 import { Engine } from "./Engine.js";
 
 export class TestOMatiqCLI {
-  private argv: IArguments;
+  private isJSON: boolean;
   private testSuite: Runbook;
   private testOMatiq: TestOMatiq;
   private rawTestSuiteBook: string;
   private qlikApp: EngineAPI.IApp;
   private engine: Engine;
 
-  constructor(argv: IArguments) {
-    this.argv = argv;
-
-    try {
-      this.rawTestSuiteBook = readFileSync(
-        this.argv.file || this.argv.f,
-        "utf8"
-      ).toString();
-    } catch (e) {
-      console.log(`\u274C ERROR 1000: while reading the test suite file`);
-      console.log(e.message);
-      process.exit(1);
-    }
+  constructor(rawTestSuiteBook: string, isJSON: boolean) {
+    this.rawTestSuiteBook = rawTestSuiteBook;
+    this.isJSON = isJSON;
 
     this.testSuiteSet();
 
+    //@ts-ignore
     this.engine = new Engine(this.testSuite.environment);
   }
 
@@ -44,9 +33,12 @@ export class TestOMatiqCLI {
     const spinner = ora("Establishing connection").start();
 
     try {
-      this.qlikApp = await this.engine.openDoc(spinner).then((_) => this.engine.doc);
+      this.qlikApp = await this.engine
+        .openDoc(spinner)
+        .then((_) => this.engine.doc);
     } catch (e) {
-      spinner.fail(e.message);
+      const message = `Error while opening the app. Make sure that the appId exists and you have access to it. Original message:\n${e.message}`;
+      spinner.fail(message);
       process.exit(1);
     }
 
@@ -61,10 +53,15 @@ export class TestOMatiqCLI {
 
     this.testOMatiq = new TestOMatiq(this.testSuite, this.qlikApp, false);
     this.emittersSet();
-    
+
     const result = await this.testOMatiq.run();
 
+    await this.engine.closeSession();
+
     console.log(`----------------------------`);
+    console.log("");
+    console.log("\u001B[32m√\u001B[39m Session closed");
+    console.log("");
     console.log(`\u001b[1mSummary\u001b[0m
   Total tests: ${result.failedTests + result.passedTests}
   Failed tests: ${result.failedTests}
@@ -78,7 +75,7 @@ export class TestOMatiqCLI {
    */
   private testSuiteSet() {
     // if the config is yaml
-    if (!this.argv.json) {
+    if (!this.isJSON) {
       try {
         this.testSuite = load(this.rawTestSuiteBook) as Runbook;
       } catch (e) {
@@ -88,7 +85,7 @@ export class TestOMatiqCLI {
       }
     }
     // if the config is json
-    if (this.argv.json) {
+    if (this.isJSON) {
       try {
         this.testSuite = JSON.parse(this.rawTestSuiteBook);
       } catch (e) {

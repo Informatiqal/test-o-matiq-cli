@@ -38,6 +38,10 @@ export interface IArguments {
   /**
    * Path to a file where the variables definitions are stored
    */
+  variables?: string;
+  /**
+   * See "variables"
+   */
   var?: string;
   /**
    * See "var"

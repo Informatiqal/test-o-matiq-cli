@@ -57,7 +57,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.4",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@types/enigma.js": "2.2.3",
+    "@types/enigma.js": "2.2.4",
     "@types/js-yaml": "4.0.7",
     "@types/node": "20.8.6",
     "@types/qlik-engineapi": "12.67.14",
