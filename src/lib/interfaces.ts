@@ -89,4 +89,12 @@ export interface IArguments {
    * See "connect"
    */
   c?: boolean;
+  /**
+   * Output the raw Qlik Engine communication traffic in the specified file
+   */
+  traffic?: string;
+  /**
+   * see "traffic"
+   */
+  t?: string;
 }

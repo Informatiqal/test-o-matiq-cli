@@ -1,6 +1,6 @@
 {
   "name": "test-o-matiq-cli",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CLI wrapper for test-o-matiq. Data tests for Qlik Sense apps ",
   "author": {
     "email": "info@informatiqal.com",

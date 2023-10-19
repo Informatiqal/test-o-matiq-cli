@@ -1,3 +1,4 @@
+import { WriteStream, createWriteStream } from "fs";
 import * as enigma from "enigma.js";
 import { WebSocket } from "ws";
 import { schema } from "./enigmaSchema";
@@ -22,13 +23,18 @@ export interface EnvironmentSaaS {
   };
 }
 
+//TODO: code repetition for traffic output. To be fixed at some point
 export class Engine {
   private enigmaConfig: enigmaJS.IConfig;
   private enigmaSession: enigmaJS.ISession;
   private config: EnvironmentDesktop | EnvironmentSaaS;
+  private outputTraffic: string;
   doc: EngineAPI.IApp;
 
-  constructor(config: EnvironmentDesktop | EnvironmentSaaS) {
+  constructor(
+    config: EnvironmentDesktop | EnvironmentSaaS,
+    outputTraffic: string
+  ) {
     this.config = config;
     const host: string =
       config.edition == "desktop" ? "127.0.0.1" : config.host;
@@ -36,6 +42,7 @@ export class Engine {
     const protocol: string = config.edition == "desktop" ? "ws" : "wss";
     const appId: string =
       config.edition == "desktop" ? "engineData" : config.appId;
+    this.outputTraffic = outputTraffic;
 
     const socketConfig = {
       rejectUnauthorized: false,
@@ -65,10 +72,30 @@ export class Engine {
   async openDoc(spinner: Ora) {
     const enigmaClass = (enigma as any).default as IEnigmaClass;
     this.enigmaSession = enigmaClass.create(this.enigmaConfig);
-    const enigmaConnection: EngineAPI.IGlobal = await this.enigmaSession.open();
-    spinner.text = "Opening the app";
 
-    this.doc = await enigmaConnection.openDoc(this.config.appId);
+    let fileStream: WriteStream;
+
+    if (this.outputTraffic) {
+      fileStream = createWriteStream(this.outputTraffic);
+
+      this.enigmaSession.on("traffic:sent", (data) =>
+        fileStream.write(JSON.stringify(data, null, 4) + "\n")
+      );
+      this.enigmaSession.on("traffic:received", (data) =>
+        fileStream.write(JSON.stringify(data, null, 4) + "\n")
+      );
+    }
+
+    try {
+      const enigmaConnection: EngineAPI.IGlobal =
+        await this.enigmaSession.open();
+      spinner.text = "Opening the app";
+
+      this.doc = await enigmaConnection.openDoc(this.config.appId);
+    } catch (e) {
+      fileStream.close();
+      throw new Error(e.message);
+    }
   }
 
   async closeSession() {
@@ -80,8 +107,23 @@ export class Engine {
   }
 
   async checkConnection() {
-      const enigmaClass = (enigma as any).default as IEnigmaClass;
-      this.enigmaSession = enigmaClass.create(this.enigmaConfig);
+    const enigmaClass = (enigma as any).default as IEnigmaClass;
+    this.enigmaSession = enigmaClass.create(this.enigmaConfig);
+
+    let fileStream: WriteStream;
+
+    if (this.outputTraffic) {
+      fileStream = createWriteStream(this.outputTraffic);
+
+      this.enigmaSession.on("traffic:sent", (data) =>
+        fileStream.write(JSON.stringify(data, null, 4) + "\n")
+      );
+      this.enigmaSession.on("traffic:received", (data) =>
+        fileStream.write(JSON.stringify(data, null, 4) + "\n")
+      );
+    }
+
+    try {
       const enigmaConnection: EngineAPI.IGlobal =
         await this.enigmaSession.open();
 
@@ -90,5 +132,9 @@ export class Engine {
         .then((r) => r.qComponentVersion);
 
       return engineVersion;
+    } catch (e) {
+      fileStream.close();
+      throw new Error(e.message);
+    }
   }
 }

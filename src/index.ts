@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
+import { resolve } from "path";
 import { homedir } from "os";
 import { minimist } from "@p-mcgowan/minimist";
 import { varLoader } from "@informatiqal/variables-loader";
@@ -24,9 +25,21 @@ if (!argv.file && !argv.f) printError(`\u274C Please provide file location`);
 if (!existsSync(argv.file || argv.f))
   printError(`\u274C File not found: "${argv.file || argv.f}"`);
 
+if (argv.traffic || argv.t) {
+  const parentFolder = resolve(argv.traffic || argv.t, "../");
+  const isParentFolderExists = existsSync(parentFolder);
+
+  if (!isParentFolderExists)
+    printError(`\u274C Folder do not exists: ${parentFolder}`);
+}
+
 async function processFile(testSuite: string) {
   try {
-    const runner = new TestOMatiqCLI(testSuite, argv.json);
+    const runner = new TestOMatiqCLI(
+      testSuite,
+      argv.json,
+      argv.t || argv.traffic
+    );
 
     await runner
       .run()
@@ -56,7 +69,11 @@ async function main() {
 
   // if testing the connection
   if (argv.c || argv.connect) {
-    const runner = new TestOMatiqCLI(withVarReplaced, argv.json);
+    const runner = new TestOMatiqCLI(
+      withVarReplaced,
+      argv.json,
+      argv.t || argv.traffic
+    );
 
     await runner
       .checkConnectivity()

@@ -14,14 +14,18 @@ export class TestOMatiqCLI {
   private qlikApp: EngineAPI.IApp;
   private engine: Engine;
 
-  constructor(rawTestSuiteBook: string, isJSON: boolean) {
+  constructor(
+    rawTestSuiteBook: string,
+    isJSON: boolean,
+    outputTraffic: string
+  ) {
     this.rawTestSuiteBook = rawTestSuiteBook;
     this.isJSON = isJSON;
 
     this.testSuiteSet();
 
     //@ts-ignore
-    this.engine = new Engine(this.testSuite.environment);
+    this.engine = new Engine(this.testSuite.environment, outputTraffic);
   }
 
   async run() {

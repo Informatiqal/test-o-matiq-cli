@@ -16,6 +16,7 @@ export function printHelp() {
     "--global,    -g     Use global variable file as source of variables values ($HOME/.test-o-matiq)",
     "--env,       -e     Use environment variables as source of variables values",
     "--inline,    -i     Provide inline/command variables values",
+    "--traffic,   -t     Output the raw Qlik Engine communication traffic in the specified file. Useful for debugging",
     "",
     "Examples:",
     "$ test-o-matiq --file ./test-suite.yaml",
