@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
+import { homedir } from "os";
 import { minimist } from "@p-mcgowan/minimist";
 import { varLoader } from "@informatiqal/variables-loader";
 
@@ -102,15 +103,24 @@ function readTestSuite() {
 }
 
 function readVariablesFile(rawTestSuite: string) {
+  // get list of all variables in the test suite
   const runbookVariablesList = rawTestSuite
     .match(/(?<!\$)(\${)(.*?)(?=})/g)
     .map((v) => v.substring(2));
 
+  // if there are any variables setup but no variables values are provided
+  // then exit
   if (
+    runbookVariablesList.length > 0 &&
     !argv.v &&
     !argv.var &&
     !argv.variables &&
-    runbookVariablesList.length > 0
+    !argv.g &&
+    !argv.global &&
+    !argv.e &&
+    !argv.env &&
+    !argv.i &&
+    !argv.inline
   ) {
     console.log(
       `Variables found in the test suite but no variables argument is provided`
@@ -118,19 +128,34 @@ function readVariablesFile(rawTestSuite: string) {
     process.exit(1);
   }
 
-  if (argv.v || argv.var || argv.variables) {
+  // if at least one variable values method is provided
+  // then get the variables values from one of the possible methods
+  if (
+    argv.v ||
+    argv.var ||
+    argv.variables ||
+    argv.g ||
+    argv.global ||
+    argv.e ||
+    argv.env ||
+    argv.i ||
+    argv.inline
+  ) {
     const variablesData = varLoader({
       sources: {
-        // environment: argv.e || argv.env,
+        environment: argv.e || argv.env,
         file: argv.v || argv.var || argv.variables,
-        // inline: argv.i || argv.inline,
+        inline: argv.i || argv.inline,
+        global:
+          argv.g || argv.global ? `${homedir()}/.test-o-matiq` : undefined,
       },
       variables: Array.from(runbookVariablesList),
-      // ignore: this.specialVariables,
     });
 
     const variablesValues = variablesData.values;
 
+    // if there is at least one variable, for which value cannot be found
+    // then exit directly and do not run any tests
     if (variablesData.missing) {
       const missingValues = variablesData.missing
         .map((v) => `  - ${v}`)
@@ -140,6 +165,7 @@ function readVariablesFile(rawTestSuite: string) {
       process.exit(1);
     }
 
+    // return mapping of variable name and its value
     return variablesValues;
   } else {
     return {};

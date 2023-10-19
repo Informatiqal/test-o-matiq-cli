@@ -48,6 +48,40 @@ export interface IArguments {
    */
   v?: string;
   /**
+   * Use global variables file as source for variables values
+   * @default false
+   */
+  global?: string;
+  /**
+   * See: global
+   */
+  g?: string;
+  /**
+   * Use the environment variables as source for variable values
+   *
+   * @default false
+   */
+  env: boolean;
+  /**
+   * See: env
+   */
+  e?: boolean;
+  /**
+   * Provide inline/command variables values
+   *
+   * ```
+   * --inline "my-variable=value123; another-variable = 456"
+   * ```
+   */
+  inline?: string;
+  /**
+   * See: inline
+   */
+  i?: string;
+  /**
+   * Path where to store the runbook messages output
+   */
+  /**
    * Test the connectivity. No tests are ran during this command
    */
   connect?: boolean;
