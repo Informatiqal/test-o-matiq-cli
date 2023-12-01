@@ -59,7 +59,7 @@
     "enigma.js": "^2.12.0",
     "js-yaml": "^4.1.0",
     "ora": "^7.0.1",
-    "test-o-matiq": "^0.4.5",
+    "test-o-matiq": "^0.6.0",
     "ws": "^8.14.2"
   },
   "engines": {
@@ -69,21 +69,21 @@
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-replace": "^5.0.4",
+    "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@types/enigma.js": "2.2.4",
-    "@types/js-yaml": "4.0.8",
-    "@types/node": "20.8.7",
-    "@types/qlik-engineapi": "12.67.15",
-    "@types/ws": "8.5.8",
+    "@types/enigma.js": "2.2.5",
+    "@types/js-yaml": "4.0.9",
+    "@types/node": "20.10.1",
+    "@types/qlik-engineapi": "12.67.16",
+    "@types/ws": "8.5.10",
     "ajv": "^8.12.0",
     "dotenv": "16.3.1",
-    "rollup": "4.1.4",
+    "rollup": "4.6.1",
     "rollup-plugin-delete": "2.0.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.2",
-    "typedoc": "^0.25.2",
+    "typedoc": "^0.25.4",
     "typescript": "^5.0.4"
   }
 }
