@@ -59,7 +59,7 @@
     "enigma.js": "^2.12.0",
     "js-yaml": "^4.1.0",
     "ora": "^7.0.1",
-    "test-o-matiq": "^0.6.0",
+    "test-o-matiq": "^0.9.0",
     "ws": "^8.14.2"
   },
   "engines": {
