@@ -1,18 +1,21 @@
 import { load } from "js-yaml";
 import { TestOMatiq } from "test-o-matiq";
-import ora, { Ora } from "ora";
+import Spinnies from "spinnies";
 
 import { Runbook } from "test-o-matiq/dist/interface/Specs.js";
+// import { Engine } from "./Engine.js";
 
-import { Engine } from "./Engine.js";
+const spinnies = new Spinnies({
+  spinner: { interval: 80, frames: ["◐", "◓", "◑", "◒"] },
+});
 
 export class TestOMatiqCLI {
   private isJSON: boolean;
   private testSuite: Runbook;
   private testOMatiq: TestOMatiq;
   private rawTestSuiteBook: string;
-  private qlikApp: EngineAPI.IApp;
-  private engine: Engine;
+  // private qlikApp: EngineAPI.IApp;
+  // private engine: Engine;
 
   constructor(
     rawTestSuiteBook: string,
@@ -34,19 +37,29 @@ export class TestOMatiqCLI {
     console.log(`----------------------------`);
     console.log("");
 
-    const spinner = ora("Establishing connection").start();
+    spinnies.add("connection", {
+      text: "Establishing connection",
+      status: "spinning",
+    });
 
-    try {
-      this.qlikApp = await this.engine
-        .openDoc(spinner)
-        .then((_) => this.engine.doc);
-    } catch (e) {
-      const message = `Error while opening the app. Make sure that the appId exists and you have access to it. Original message:\n${e.message}`;
-      spinner.fail(message);
-      process.exit(1);
-    }
+    // try {
+    //   this.qlikApp = await this.engine
+    //     .openDoc(spinnies)
+    //     .then((_) => this.engine.doc);
+    // } catch (e) {
+    //   const message = `Error while opening the app. Make sure that the appId exists and you have access to it. Original message:\n${e.message}`;
+    //   spinnies.update("connection", {
+    //     status: "fail",
+    //     text: message,
+    //   });
+    //   process.exit(1);
+    // }
 
-    spinner.succeed("App open");
+    spinnies.update("connection", {
+      status: "succeed",
+      text: "App open",
+    });
+    spinnies.remove("connection");
     console.log("");
 
     if (this.testSuite.description) {
@@ -55,12 +68,12 @@ export class TestOMatiqCLI {
       console.log("");
     }
 
-    this.testOMatiq = new TestOMatiq(this.testSuite, this.qlikApp, false);
+    this.testOMatiq = new TestOMatiq(this.testSuite, false);
     this.emittersSet();
 
     const result = await this.testOMatiq.run();
 
-    await this.engine.closeSession();
+    // await this.engine.closeSession();
 
     console.log(`----------------------------`);
     console.log("");
@@ -69,7 +82,7 @@ export class TestOMatiqCLI {
     console.log(`\u001b[1mSummary\u001b[0m
   Total tests: ${result.failedTests + result.passedTests}
   Failed tests: ${result.failedTests}
-  Run time: ${result.totalTime} s`);
+  Run time: ${result.totalTime}s`);
 
     return result;
   }
@@ -106,32 +119,31 @@ export class TestOMatiqCLI {
   private emittersSet() {
     const _this = this;
 
-    let spinners: { [k: string]: Ora } = {};
-
     this.testOMatiq.emitter.on("testResult", function (result) {
       const spinnerMessage = `${result.name}\n\t${result.message}\n`;
       result.status
-        ? spinners[result.name].succeed(spinnerMessage)
-        : spinners[result.name].fail(spinnerMessage);
-      // console.log(`END -> ${result.name}`);
+        ? spinnies.update(result.name, {
+            text: spinnerMessage,
+            status: "succeed",
+          })
+        : spinnies.update(result.name, {
+            text: spinnerMessage,
+            status: "fail",
+          });
+
+      spinnies.remove(result.name);
     });
 
     this.testOMatiq.emitter.on("testStart", function (name) {
-      const spinner = ora({
-        spinner: "circleHalves",
+      spinnies.add(name, {
         text: name,
+        status: "spinning",
       });
-      spinners[name] = spinner;
-      spinners[name].start();
-
-      // console.log(`START -> ${name}`);
     });
   }
 
   async checkConnectivity() {
-    const engineVersion = await this.engine.checkConnection();
-    await this.engine.closeSession();
-
-    return engineVersion;
+    const testOMatiq = new TestOMatiq(this.testSuite, false);
+    // return await testOMatiq.checkConnection();
   }
 }

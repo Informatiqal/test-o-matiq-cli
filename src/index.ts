@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { homedir } from "os";
-import { minimist } from "@p-mcgowan/minimist";
+import minimist from "minimist";
 import { varLoader } from "@informatiqal/variables-loader";
 
 import { TestOMatiqCLI } from "./lib/Cli";
@@ -11,7 +11,7 @@ import { printError } from "./lib/common";
 
 import { IArguments } from "./lib/interfaces";
 
-const argv: IArguments = minimist(process.argv.slice(2));
+const argv = minimist<IArguments>(process.argv.slice(2));
 
 // start without arguments - show help
 if (process.argv.length == 2) printHelp();
@@ -26,6 +26,10 @@ if (!existsSync(argv.file || argv.f))
   printError(`\u274C File not found: "${argv.file || argv.f}"`);
 
 if (argv.traffic || argv.t) {
+  const trafficLocation = argv.traffic || argv.t;
+  if (trafficLocation.toString() == "true")
+    printError(`\u274C Please provide file name for the traffic log`);
+
   const parentFolder = resolve(argv.traffic || argv.t, "../");
   const isParentFolderExists = existsSync(parentFolder);
 
@@ -121,9 +125,13 @@ function readTestSuite() {
 
 function readVariablesFile(rawTestSuite: string) {
   // get list of all variables in the test suite
-  const runbookVariablesList = rawTestSuite
-    .match(/(?<!\$)(\${)(.*?)(?=})/g)
-    .map((v) => v.substring(2));
+  let runbookVariablesList: string[] = [];
+
+  try {
+    runbookVariablesList = rawTestSuite
+      .match(/(?<!\$)(\${)(.*?)(?=})/g)
+      .map((v) => v.substring(2));
+  } catch (e) {}
 
   // if there are any variables setup but no variables values are provided
   // then exit

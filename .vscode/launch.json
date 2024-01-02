@@ -23,9 +23,14 @@
       ],
       "args": [
         "-f",
-        "./test-suite-examples/example1.yaml",
+        "./test-suite-examples/playground.yaml",
         "-v",
-        "./test-suite-examples/example1_variables.yaml"
+        "./test-suite-examples/example1_variables.yaml",
+        "-o",
+        "./test-suite-examples/test.json",
+        "-t",
+        "test-traffic.json"
+
       ]
     },
     {

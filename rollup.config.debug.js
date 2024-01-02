@@ -1,6 +1,6 @@
 import fs from "fs";
 import typescript from "rollup-plugin-typescript2";
-import commonjs from "@rollup/plugin-commonjs";
+// import commonjs from "@rollup/plugin-commonjs";
 import del from "rollup-plugin-delete";
 import json from "@rollup/plugin-json";
 // import pkg from "./package.json";
@@ -21,12 +21,13 @@ export default {
     "os",
     "https",
     "readline",
+    "path",
   ],
   plugins: [
     del({
       targets: "dist/*",
     }),
-    commonjs(),
+    // commonjs(),
     json(),
     typescript({
       // typescript: require("typescript"),

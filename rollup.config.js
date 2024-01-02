@@ -1,6 +1,7 @@
 import typescript from "@rollup/plugin-typescript";
 import del from "rollup-plugin-delete";
 import json from "@rollup/plugin-json";
+import commonjs from "@rollup/plugin-commonjs";
 import { readFileSync } from "fs";
 import replace from "@rollup/plugin-replace";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
@@ -13,15 +14,15 @@ export default {
     {
       sourcemap: true,
       file: pkg.main,
-      format: "es",
+      format: "cjs",
     },
   ],
   external: [
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {}),
+    // ...Object.keys(pkg.dependencies || {}),
+    // ...Object.keys(pkg.peerDependencies || {}),
     "fs",
     "https",
-    "path"
+    "path",
   ],
   plugins: [
     del({
@@ -33,10 +34,18 @@ export default {
       },
       preventAssignment: true,
     }),
-    nodeResolve(),
+    commonjs(),
+    nodeResolve({
+      preferBuiltins: true,
+    }),
     json({
       compact: true,
-      include: ["node_modules/enigma.js/schemas/12.20.0.json"],
+      include: [
+        "node_modules/enigma.js/schemas/12.20.0.json",
+        "node_modules/cli-spinners/spinners.json",
+        "node_modules/spinnies/spinners.json",
+        "node_modules/ajv/dist/refs/json-schema-draft-07.json"
+      ],
     }),
     typescript(),
   ],
